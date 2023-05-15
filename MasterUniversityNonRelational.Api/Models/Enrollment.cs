@@ -38,9 +38,10 @@ namespace MasterUniversityNonRelational.Api.Models
         
         [BsonElement("lecturerId")]
         public string LecturerID { get; set; }
-        
-        public Courses course { get; set; }
-        
+
+        [BsonElement("courseId")]
+        public string CourseID { get; set; }
+
         [BsonElement("assignmentScore")]
         public double AssignmentScore { get; set; }
 

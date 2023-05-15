@@ -23,6 +23,6 @@ namespace MasterUniversityNonRelational.Api.Models
         public int Cost { get; set; }
 
         [BsonElement("isDeleted")]
-        public int isDeleted { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
