@@ -11,37 +11,37 @@
     [ApiController]
     public class LecturerController : ControllerBase
     {
-        private readonly IUniversityService _universityService;
-        public LecturerController(IUniversityService universityService)
+        private readonly ILecturerService _lecturerService;
+        public LecturerController(ILecturerService lecturerService)
         {
-            this._universityService = universityService;
+            this._lecturerService = lecturerService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UniversityData>>> Get()
+        public async Task<ActionResult<IEnumerable<Lecturer>>> Get()
         {
-            var result = await _universityService.GetAllAsync();
+            var result = await _lecturerService.GetAllAsync();
             return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UniversityData>> GetByID(Guid id)
+        public async Task<ActionResult<Lecturer>> GetByID(Guid id)
         {
-            var result = await _universityService.GetByIdAsync(id);
+            var result = await _lecturerService.GetByIdAsync(id);
             return Ok(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult<UniversityData>> Save([FromBody] UniversityData universityData)
+        public async Task<ActionResult<Lecturer>> Save([FromBody] Lecturer lecturerData)
         {
-            var result = await _universityService.Save(universityData);
+            var result = await _lecturerService.Save(lecturerData);
             return Ok(result);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<UniversityData>> Update(Guid id, [FromBody] UniversityData universityData)
+        public async Task<ActionResult<Lecturer>> Update(Guid id, [FromBody] Lecturer lecturerData)
         {
-            var checkData = await _universityService.GetByIdAsync(id);
+            var checkData = await _lecturerService.GetByIdAsync(id);
 
             if (id.ToString() != checkData.Id)
             {
@@ -49,22 +49,22 @@
             }
             else
             {
-                await _universityService.Update(id.ToString(), universityData);
+                await _lecturerService.Update(id.ToString(), lecturerData);
             }
-            return Ok(universityData);
+            return Ok(lecturerData);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var data = await _universityService.GetByIdAsync(id);
+            var data = await _lecturerService.GetByIdAsync(id);
             if (data == null)
             {
                 return NotFound();
             }
             else
             {
-                await _universityService.Delete(id);
+                await _lecturerService.Delete(id);
             }
             return NoContent();
         }
