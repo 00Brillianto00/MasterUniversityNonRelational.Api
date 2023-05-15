@@ -26,7 +26,7 @@ namespace MasterUniversityNonRelational.Api.Models
         public int TotalCoursePerSemester { get; set; }
 
         [BsonElement("gpaPerSemester")]
-        public double GPAPerSemester { get; set; }
+        public double AverageScorePerSemester { get; set; }
         public List<EnrollmentDetail>? enrollmentDetail { get; set; }
 
         [BsonElement("isdeleted")]
@@ -35,11 +35,22 @@ namespace MasterUniversityNonRelational.Api.Models
 
     public class EnrollmentDetail
     {
-        public Courses courses { get; set; }
+        
+        [BsonElement("lecturerId")]
+        public string LecturerID { get; set; }
+        
+        public Courses course { get; set; }
+        
+        [BsonElement("assignmentScore")]
         public double AssignmentScore { get; set; }
-        public Lecturer lecturer { get; set; } 
+
+        [BsonElement("midExamScore")]
         public double MidExamScore { get; set; }
+
+        [BsonElement("finalExamScore")]
         public double FinalExamScore { get; set; }
+
+        [BsonElement("courseAverageScore")]
         public double CourseAverageScore { get; set; }
     }
 }
