@@ -9,5 +9,6 @@ namespace MasterUniversityNonRelational.Api.Interfaces
         Task<Student> Save(Student studentData);
         Task<Student> Update(String Id, Student studentData);
         Task<bool> Delete(Guid id);
+        Task <string> TestCase(Student studentData, int testCases);
     }
 }

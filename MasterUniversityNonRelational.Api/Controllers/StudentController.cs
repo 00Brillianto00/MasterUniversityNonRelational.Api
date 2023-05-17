@@ -38,6 +38,13 @@
             return Ok(result);
         }
 
+        [HttpPost("testInsert/{testCases}")]
+        public async Task<ActionResult<string>> TestSave([FromBody] Student studentData, int testCases)
+        {
+            var result = await _studentService.TestCase(studentData, testCases);
+            return Ok(result);
+        }
+
         [HttpPut("{id}")]
         public async Task<ActionResult<Student>> Update(Guid id, [FromBody] Student studentData)
         {

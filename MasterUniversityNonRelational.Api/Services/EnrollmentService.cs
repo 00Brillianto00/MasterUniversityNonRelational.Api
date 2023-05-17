@@ -51,8 +51,8 @@ namespace MasterUniversityNonRelational.Api.Services
         {
             enrollmentData.Id = Guid.NewGuid().ToString();
             enrollmentData.IsDeleted = false;
-            Random rnd = new Random();
-            int month = rnd.Next(1, 13);
+            Random rng = new Random();
+            int month = rng.Next(1, 13);
             int countCourses = 0;
             int countCredit = 0;
             int countCost = 0;
@@ -61,9 +61,9 @@ namespace MasterUniversityNonRelational.Api.Services
             {
 
                 countCourses++;
-                data.AssignmentScore = rnd.Next(1, 100);
-                data.MidExamScore = rnd.Next(1, 100);
-                data.FinalExamScore = rnd.Next(1, 100);
+                data.AssignmentScore = rng.Next(1, 100);
+                data.MidExamScore = rng.Next(1, 100);
+                data.FinalExamScore = rng.Next(1, 100);
                 data.CourseAverageScore = (data.FinalExamScore + data.MidExamScore + data.AssignmentScore) / 3;
                 countGPA = countGPA + data.CourseAverageScore;
             }
