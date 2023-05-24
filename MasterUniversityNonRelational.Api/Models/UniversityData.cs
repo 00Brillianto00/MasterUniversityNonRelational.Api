@@ -18,7 +18,7 @@ namespace MasterUniversityNonRelational.Api.Models
         public string BranchName { get; set; }
 
         [BsonElement("branchLocation")]
-        public int BranchLocation { get; set; }
+        public string BranchLocation { get; set; }
 
         [BsonElement("branchPostalCode")]
         public int BranchPostalCode { get; set; }

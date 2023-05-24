@@ -27,7 +27,7 @@ namespace MasterUniversityNonRelational.Api.Models
 
         [BsonElement("averageScorePerSemester")]
         public double AverageScorePerSemester { get; set; }
-        public List<EnrollmentDetail>? enrollmentDetail { get; set; }
+        public List<EnrollmentDetail> enrollmentDetail { get; set; }
 
         [BsonElement("isdeleted")]
         public bool IsDeleted { get; set; }

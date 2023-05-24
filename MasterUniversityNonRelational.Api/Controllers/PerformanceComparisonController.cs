@@ -14,17 +14,17 @@
     [ApiController]
     public class PerformanceComparisonController : ControllerBase
     {
-        private readonly IPerformanceComparisonService _performanceComparisonService;
+        //private readonly IPerformanceComparisonService _performanceComparisonService;
         private readonly IStudentService _studentService;
         private readonly IEnrollmentService _enrollmentService;
         private readonly ICourseService _courseService;
         private readonly ILecturerService _lecturerService;
         private readonly IUniversityService _universityService;
 
-        public PerformanceComparisonController(IPerformanceComparisonService performanceComparisonService , IStudentService studentService, 
+        public PerformanceComparisonController(IStudentService studentService, 
             IEnrollmentService enrollmentService, ICourseService courseService, ILecturerService lecturerService, IUniversityService universityService)
         {
-            this._performanceComparisonService = performanceComparisonService;
+            //this._performanceComparisonService = performanceComparisonService;
             this._studentService = studentService;
             this._enrollmentService = enrollmentService;
             this._courseService = courseService;

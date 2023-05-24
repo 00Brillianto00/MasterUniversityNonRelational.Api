@@ -138,7 +138,6 @@ namespace MasterUniversityNonRelational.Api.Services
                     studentData.StudentAddress = address + " No." +rng.Next(0, 50) + ","+ city+ ","+province+","+country;
                     studentData.StudentPostalCode = rng.Next(1000, 9999);
                     studentData.IsDeleted = false;
-                    studentDatas.Add(studentData);
                     await _student.InsertOneAsync(studentData);
                     studentDatas.Add(studentData);
                 }

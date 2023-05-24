@@ -125,6 +125,7 @@ namespace MasterUniversityNonRelational.Api.Services
                     for (int y = 0; y < testCases; y++)
                     {
                         Enrollment enrollmentHeader = new Enrollment();
+                        enrollmentHeader.enrollmentDetail = new List<EnrollmentDetail>();
                         Guid id = Guid.NewGuid();
                         enrollmentHeader.Id = id.ToString();
                         enrollmentHeader.studentID = students[x].Id;
@@ -143,10 +144,9 @@ namespace MasterUniversityNonRelational.Api.Services
                         {
                             enrollmentHeader.SemesterType = "EVEN";
                         }
-                        //List<EnrollmentDetail> Details = new List <EnrollmentDetail>();
+                        //List<EnrollmentDetail> details = new List <EnrollmentDetail>();
                         for (int z = 0; z < 10; z++)
                         {
-                            //EnrollmentDetail enrollmentDetail = new EnrollmentDetail();
                             EnrollmentDetail enrollmentDetail = new EnrollmentDetail();
                             enrollmentDetail.CourseID = courses[z].Id;
                             enrollmentDetail.LecturerID = lecturers[rng.Next(0, lecturers.Count)].Id;
@@ -156,8 +156,9 @@ namespace MasterUniversityNonRelational.Api.Services
                             enrollmentDetail.CourseAverageScore = (enrollmentDetail.AssignmentScore + enrollmentDetail.MidExamScore + enrollmentDetail.FinalExamScore) / 3.0;
                             enrollmentHeader.enrollmentDetail.Add(enrollmentDetail);
                         }
-
+                        //enrollmentHeader.enrollmentDetail.Add(details);
                         await _enrollment.InsertOneAsync(enrollmentHeader);
+                        enrollments.Add(enrollmentHeader);
                     }
                 }
                 return enrollments;
