@@ -9,5 +9,6 @@ namespace MasterUniversityNonRelational.Api.Interfaces
         Task<Courses> Save(Courses courseData);
         Task<Courses> Update(String Id, Courses courseData);
         Task<bool> Delete(Guid id);
+        Task<Courses> GetByIdStringAsync(string ID);
     }
 }

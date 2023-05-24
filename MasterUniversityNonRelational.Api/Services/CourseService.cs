@@ -87,5 +87,17 @@ namespace MasterUniversityNonRelational.Api.Services
                 throw new Exception("error when deleting data");
             }
         }
+        public async Task<Courses> GetByIdStringAsync(string ID)
+        {
+            try
+            {
+                var data = await _course.Find(Courses => Courses.Id.Equals(ID) && Courses.IsDeleted == false).FirstOrDefaultAsync();
+                return data;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error When Retrieving Data");
+            }
+        }
     }
 }

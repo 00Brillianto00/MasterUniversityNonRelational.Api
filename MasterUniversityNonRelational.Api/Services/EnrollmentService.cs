@@ -12,8 +12,9 @@ namespace MasterUniversityNonRelational.Api.Services
         private readonly IMongoCollection<Enrollment> _enrollment;
         private readonly IMongoCollection<Courses> _courses;
         private Random rng = new Random();
+        private readonly ICourseService _courseService;
 
-        public EnrollmentService(IMongoClient mongoDBClient, IDatabaseSettings databaseSettings)
+        public EnrollmentService(IMongoClient mongoDBClient, IDatabaseSettings databaseSettings, ICourseService courseService)
         {
 
             var database = mongoDBClient.GetDatabase(databaseSettings.DatabaseName);
@@ -21,6 +22,8 @@ namespace MasterUniversityNonRelational.Api.Services
             _enrollment = database.GetCollection<Enrollment>(databaseSettings.CollectionName);
             databaseSettings.CollectionName = "Courses";
             _courses = database.GetCollection<Courses>(databaseSettings.CollectionName);
+            this._courseService= courseService; 
+            
         }
 
         public async Task<IEnumerable<Enrollment>> GetAllAsync()
@@ -122,6 +125,7 @@ namespace MasterUniversityNonRelational.Api.Services
             {
                 for (int x = 0; x < students.Count; x++)
                 {
+
                     for (int y = 0; y < testCases; y++)
                     {
                         Enrollment enrollmentHeader = new Enrollment();
@@ -162,6 +166,59 @@ namespace MasterUniversityNonRelational.Api.Services
                     }
                 }
                 return enrollments;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error When Running Test Cases");
+            }
+        }
+
+        public async Task<List<Enrollment>> TestEnrollmentUpdate(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student> students)
+        {
+            try
+            {
+                List<Enrollment> newEnrollments = new List<Enrollment>();
+                for (int x = 0; x < students.Count; x++)
+                {
+                    Enrollment enrollmentHeader = await _enrollment.Find(Enrollment => Enrollment.studentID.Equals(students[x].Id) && Enrollment.IsDeleted == false).FirstOrDefaultAsync();
+                    enrollmentHeader.IsDeleted = false;
+                    string enrollID = enrollmentHeader.Id;
+                    //enrollmentHeader.GPAPerSemester = 0;
+                    string type = enrollmentHeader.SemesterType;
+                    enrollmentHeader.SemesterType = "UPDATED_" + type;
+
+                    int countCourse = 0;
+                    double countAverages = 0.0;
+                    int countCost = 0;
+                    int countCredit = 0;
+                    
+
+                    for (int z = 0; z<enrollmentHeader.enrollmentDetail.Count(); z++)
+                    {
+                        string ID = courses[rng.Next(0, courses.Count)].Id;
+                        enrollmentHeader.enrollmentDetail[x].CourseID = ID;
+                        enrollmentHeader.enrollmentDetail[x].LecturerID = lecturers[rng.Next(0, lecturers.Count)].Id;
+                        enrollmentHeader.enrollmentDetail[x].AssignmentScore = rng.Next(1, 100);
+                        enrollmentHeader.enrollmentDetail[x].MidExamScore = rng.Next(1, 100);
+                        enrollmentHeader.enrollmentDetail[x].FinalExamScore = rng.Next(1, 100);
+                        enrollmentHeader.enrollmentDetail[x].CourseAverageScore = (enrollmentHeader.enrollmentDetail[x].AssignmentScore + 
+                            enrollmentHeader.enrollmentDetail[x].MidExamScore + enrollmentHeader.enrollmentDetail[x].FinalExamScore) / 3.0;
+                        Courses data = await _courseService.GetByIdStringAsync(ID);
+                        countCourse++;
+                        countAverages = countAverages + enrollmentHeader.enrollmentDetail[x].CourseAverageScore;
+                        countCost = countCost + data.Cost;
+                        countCredit= countCredit + data.Credit;
+                    }
+
+                    enrollmentHeader.TotalCoursePerSemester = countCourse;
+                    enrollmentHeader.TotalCostPerSemester = countCost;
+                    enrollmentHeader.TotalCreditsPerSemester = countCredit;
+                    enrollmentHeader.AverageScorePerSemester= (countAverages/countCourse)/1.0;
+
+                   await _enrollment.ReplaceOneAsync(enrollmentData => enrollmentData.Id.Equals(enrollID), enrollmentHeader);
+                   newEnrollments.Add(enrollmentHeader);
+                }
+                return newEnrollments;
             }
             catch (Exception ex)
             {

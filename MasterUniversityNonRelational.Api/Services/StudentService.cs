@@ -149,6 +149,48 @@ namespace MasterUniversityNonRelational.Api.Services
             }
         }
 
+        public async Task<List<Student>> TestStudentUpdate(int testCase)
+        {
+
+            List<Student> studentData = new List<Student>();
+            List<Student> NewStudentData = new List<Student>();
+            try
+            {
+                studentData = _student.Find(student => true && student.IsDeleted.Equals(false)).Limit(testCase).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error When Retrieving Data");
+            }
+
+            long StudentNumber = rng.NextInt64(1000000000, 9999999999);
+            string firstName = "UPDATED_StudentFirstName";
+            string middleName = "UPDATED_StudentMiddleName";
+            string lastName = "UPDATED_StudentLastName_";
+            string address = "UPDATED_JL Kemanggisan Raya";
+            string country = "UPDATED_Indonesia";
+            string province = "UPDATED_DKI Jakarta";
+            string city = "UPDATED_Jakarta Barat";
+            
+            for (int x=0; x < studentData.Count(); x++)
+            {
+                string Id = studentData[x].Id;
+                    string getModifier = studentData[x].StudentNumber.ToString().Substring(StudentNumber.ToString().Length - 4, 4);
+                    studentData[x].StudentEmail = firstName + "." + lastName + getModifier + "@Univ.ac.id";
+                    studentData[x].StudentName = firstName + " "+ middleName + " "+lastName + getModifier;
+                    studentData[x].StudentGPA = rng.NextDouble() * (4.0 - 1.0) + 1.0;
+                    studentData[x].TotalCreditsEarned = rng.Next(0, 100); 
+                    studentData[x].EnrolledYear = rng.Next(2000, 2023).ToString();
+                    studentData[x].StudentDateOfBirth = generateDoB();
+                    studentData[x].StudentPhoneNumber = generatePhoneNum();
+                    studentData[x].StudentAddress = address + " No." +rng.Next(0, 50) + ","+ city+ ","+province+","+country;
+                    studentData[x].StudentPostalCode = rng.Next(1000, 9999);
+                    await _student.ReplaceOneAsync(studentData => studentData.Id.Equals(Id), studentData[x]);
+                    NewStudentData.Add(studentData[x]);
+            }
+            return NewStudentData;
+        }
+
         public async Task<string> TestCase(Student studentData, int testCases)
         {
             Stopwatch stopWatch = new Stopwatch();
