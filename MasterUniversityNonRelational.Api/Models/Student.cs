@@ -13,7 +13,7 @@ namespace MasterUniversityNonRelational.Api.Models
         public string UniversityID { get; set; }
 
         [BsonElement("studentNumber")]
-        public int StudentNumber { get; set; }
+        public long StudentNumber { get; set; }
         
         [BsonElement("studentEmail")]
         public string StudentEmail { get; set; }

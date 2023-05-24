@@ -2,6 +2,7 @@
 using MasterUniversityNonRelational.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Driver;
+using System.Data;
 using System.Diagnostics;
 
 namespace MasterUniversityNonRelational.Api.Services
@@ -106,6 +107,49 @@ namespace MasterUniversityNonRelational.Api.Services
             DateTime RandomDay = startDate.AddDays(rng.Next(rangeDate));
             return RandomDay;
         }
+
+        public async Task<List<Student>> TestStudentInsert(int testCases, List<UniversityData> universities)
+        {
+            List<Student> studentDatas = new List<Student>();
+            long StudentNumber = rng.NextInt64(1000000000, 9999999999);
+            string firstName = "StudentFirstName";
+            string middleName = "StudentMiddleName";
+            string lastName = "StudentLastName_";
+            string address = "JL Kemanggisan Raya";
+            string country = "Indonesia";
+            string province = "DKI Jakarta";
+            string city = "Jakarta Barat";
+            try
+            {
+                for (int x = 0; x < testCases; x++)
+                {
+                    Student studentData = new Student();
+                    studentData.Id = Guid.NewGuid().ToString();
+                    studentData.UniversityID = universities[rng.Next(0,universities.Count())].Id;
+                    studentData.StudentNumber = StudentNumber++;
+                    string getModifier = studentData.StudentNumber.ToString().Substring(StudentNumber.ToString().Length - 4, 4);
+                    studentData.StudentEmail = firstName + "." + lastName + getModifier + "@Univ.ac.id";
+                    studentData.StudentName = firstName + " "+ middleName + " "+lastName + getModifier;
+                    studentData.StudentGPA = rng.NextDouble() * (4.0 - 1.0) + 1.0;
+                    studentData.TotalCreditsEarned = rng.Next(0, 100); 
+                    studentData.EnrolledYear = rng.Next(2000, 2023).ToString();
+                    studentData.StudentDateOfBirth = generateDoB();
+                    studentData.StudentPhoneNumber = generatePhoneNum();
+                    studentData.StudentAddress = address + " No." +rng.Next(0, 50) + ","+ city+ ","+province+","+country;
+                    studentData.StudentPostalCode = rng.Next(1000, 9999);
+                    studentData.IsDeleted = false;
+                    studentDatas.Add(studentData);
+                    await _student.InsertOneAsync(studentData);
+                    studentDatas.Add(studentData);
+                }
+                return studentDatas;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error When Saving Data");
+            }
+        }
+
         public async Task<string> TestCase(Student studentData, int testCases)
         {
             Stopwatch stopWatch = new Stopwatch();

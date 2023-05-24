@@ -1,6 +1,9 @@
 ﻿using MasterUniversityNonRelational.Api.Interfaces;
 using MasterUniversityNonRelational.Api.Models;
 using MongoDB.Driver;
+using NUnit.Framework.Internal;
+using System.Data;
+using System.Diagnostics;
 
 namespace MasterUniversityNonRelational.Api.Services
 {
@@ -8,6 +11,7 @@ namespace MasterUniversityNonRelational.Api.Services
     {
         private readonly IMongoCollection<Enrollment> _enrollment;
         private readonly IMongoCollection<Courses> _courses;
+        private Random rng = new Random();
 
         public EnrollmentService(IMongoClient mongoDBClient, IDatabaseSettings databaseSettings)
         {
@@ -108,6 +112,59 @@ namespace MasterUniversityNonRelational.Api.Services
             catch (Exception ex)
             {
                 throw new Exception("error when deleting data");
+            }
+        }
+
+        public async Task<List<Enrollment>> TestEnrollmentInsert(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student>students)
+        {
+            List<Enrollment> enrollments = new List<Enrollment>();
+            try
+            {
+                for (int x = 0; x < students.Count; x++)
+                {
+                    for (int y = 0; y < testCases; y++)
+                    {
+                        Enrollment enrollmentHeader = new Enrollment();
+                        Guid id = Guid.NewGuid();
+                        enrollmentHeader.Id = id.ToString();
+                        enrollmentHeader.studentID = students[x].Id;
+                        enrollmentHeader.IsDeleted = false;
+                        //enrollmentHeader.GPAPerSemester = 0;
+                        enrollmentHeader.TotalCoursePerSemester = 10;
+                        enrollmentHeader.TotalCostPerSemester = rng.Next(10000000, 99999999);
+                        enrollmentHeader.TotalCreditsPerSemester = rng.Next(10, 20);
+                        enrollmentHeader.Year = rng.Next(2000, 2023).ToString();
+                        int STYPE = rng.Next(1, 2);
+                        if (STYPE == 1)
+                        {
+                            enrollmentHeader.SemesterType = "ODD";
+                        }
+                        else
+                        {
+                            enrollmentHeader.SemesterType = "EVEN";
+                        }
+                        //List<EnrollmentDetail> Details = new List <EnrollmentDetail>();
+                        for (int z = 0; z < 10; z++)
+                        {
+                            //EnrollmentDetail enrollmentDetail = new EnrollmentDetail();
+                            EnrollmentDetail enrollmentDetail = new EnrollmentDetail();
+                            enrollmentDetail.CourseID = courses[z].Id;
+                            enrollmentDetail.LecturerID = lecturers[rng.Next(0, lecturers.Count)].Id;
+                            enrollmentDetail.AssignmentScore = rng.Next(1, 100);
+                            enrollmentDetail.MidExamScore = rng.Next(1, 100);
+                            enrollmentDetail.FinalExamScore = rng.Next(1, 100);
+                            enrollmentDetail.CourseAverageScore = (enrollmentDetail.AssignmentScore + enrollmentDetail.MidExamScore + enrollmentDetail.FinalExamScore) / 3.0;
+                            enrollmentHeader.enrollmentDetail.Add(enrollmentDetail);
+                        }
+
+                        await _enrollment.InsertOneAsync(enrollmentHeader);
+                    }
+                }
+                return enrollments;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error When Running Test Cases");
             }
         }
     }

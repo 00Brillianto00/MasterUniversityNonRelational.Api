@@ -9,5 +9,6 @@ namespace MasterUniversityNonRelational.Api.Interfaces
         Task<Enrollment> Save(Enrollment branchData);
         Task<Enrollment> Update(String Id, Enrollment branchData);
         Task<bool> Delete(Guid id);
+        Task<List<Enrollment>> TestEnrollmentInsert(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student> students);
     }
 }

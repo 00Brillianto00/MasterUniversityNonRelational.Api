@@ -16,8 +16,8 @@ namespace MasterUniversityNonRelational.Api.Models
         [BsonElement("year")]
         public string Year { get; set; }
 
-        [BsonElement("totalCreditPerYear")]
-        public int TotalCreditsPerYear { get; set; }
+        [BsonElement("totalCreditsPerSemester")]
+        public int TotalCreditsPerSemester { get; set; }
 
         [BsonElement("totalCostPerSemester")]
         public int TotalCostPerSemester { get; set; }
@@ -25,7 +25,7 @@ namespace MasterUniversityNonRelational.Api.Models
         [BsonElement("totalCoursePerSemester")]
         public int TotalCoursePerSemester { get; set; }
 
-        [BsonElement("gpaPerSemester")]
+        [BsonElement("averageScorePerSemester")]
         public double AverageScorePerSemester { get; set; }
         public List<EnrollmentDetail>? enrollmentDetail { get; set; }
 
