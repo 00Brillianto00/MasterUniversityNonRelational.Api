@@ -137,36 +137,29 @@
             return Ok(result);
         }
 
-        //[HttpDelete("testDelete/{testCases}")]
-        //public async Task<ActionResult<TestResultData>> TestDelete(int testCases)
-        //{
-        //    Stopwatch stopwatch = new Stopwatch();
-        //    TestResultData result = new TestResultData();
-        //    int studentDataNom = testCases / 100;
-        //    int enrollmentDataNom = 10;
+        [HttpDelete("testDelete/{testCases}")]
+        public async Task<ActionResult<TestResultData>> TestDelete(int testCases)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            TestResultData result = new TestResultData();
+            int studentDataNom = testCases / 100;
+            int enrollmentDataNom = 10;
 
+            stopwatch.Start();
 
-        //    var getCourses = await _courseService.GetAllAsync();
-        //    List<Courses> courses = getCourses.ToList();
+            var students = await _studentService.TestStudentGet(studentDataNom);
+            var tes = await _studentService.TestStudentDelete(studentDataNom, students);
+            var tes2 = await _enrollmentService.TestEnrollmentDelete(students);
 
-        //    var getLecturers = await _lecturerService.GetAllAsync();
-        //    List<Lecturer> lecturers = getLecturers.ToList();
+            if(tes == true && tes2 == true)
+            {
+                stopwatch.Stop();
+            }
 
-        //    var getUniv = await _universityService.GetAllAsync();
-        //    List<UniversityData> universities = getUniv.ToList();
+            result = getTestResult(stopwatch, testCases);
 
-        //    stopwatch.Start();
-
-        //    var updatedStudents = await _studentService.TestStudentUpdate(testCases);
-
-        //    var enrollments = await _enrollmentService.TestEnrollmentGet(enrollmentDataNom, universities, lecturers, courses, updatedStudents);
-
-        //    stopwatch.Stop();
-
-        //    result = getTestResult(stopwatch, testCases);
-
-        //    return Ok(result);
-        //}
+            return Ok(result);
+        }
 
 
         private TestResultData getTestResult(Stopwatch stopWatch, int testCases)

@@ -126,9 +126,10 @@ namespace MasterUniversityNonRelational.Api.Services
             {
                 for (int x = 0; x < students.Count; x++)
                 {
-
+                    //50 student
                     for (int y = 0; y < testCases; y++)
                     {
+                        //each student should have 10
                         Enrollment enrollmentHeader = new Enrollment();
                         enrollmentHeader.enrollmentDetail = new List<EnrollmentDetail>();
                         Guid id = Guid.NewGuid();
@@ -261,6 +262,25 @@ namespace MasterUniversityNonRelational.Api.Services
                     studentEnrollments.Add(studentEnrollment);
                 }
                 return studentEnrollments;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error When Running Test Cases");
+            }
+        }
+
+        public async Task <bool> TestEnrollmentDelete(List<Student> students)
+        {
+            try
+            {
+                int count = 0;
+                foreach (var data in students)
+                {
+                    var deleteFilter = Builders<Enrollment>.Filter.Eq(x => x.studentID, data.Id);
+                    await _enrollment.DeleteManyAsync(deleteFilter);
+                    count++;
+                }
+                return true;
             }
             catch (Exception ex)
             {

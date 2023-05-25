@@ -208,6 +208,24 @@ namespace MasterUniversityNonRelational.Api.Services
             return studentData;
         }
 
+        public async Task<bool> TestStudentDelete(int testCase, List<Student>studentData)
+        {
+            try
+            {
+                int count = 0;
+                foreach (var data in studentData)
+                {
+                    await _student.DeleteOneAsync(studentData => studentData.Id.Equals(data.Id));
+                    count++;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error When Retrieving Data");
+            }
+        }
+
         public async Task<string> TestCase(Student studentData, int testCases)
         {
             Stopwatch stopWatch = new Stopwatch();
