@@ -1,5 +1,6 @@
 ﻿using MasterUniversityNonRelational.Api.Interfaces;
 using MasterUniversityNonRelational.Api.Models;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using NUnit.Framework.Internal;
 using System.Data;
@@ -224,6 +225,48 @@ namespace MasterUniversityNonRelational.Api.Services
             {
                 throw new Exception("Error When Running Test Cases");
             }
+        }
+
+        public async Task<List<StudentEnrollmentDataModel>> TestEnrollmentGet(int testCases, List<Student> students)
+        {
+            List<Enrollment> enrollments = new List<Enrollment>();
+            List <StudentEnrollmentDataModel>studentEnrollments = new List<StudentEnrollmentDataModel>();
+            Enrollment enrollment = new Enrollment();
+            try
+            {
+                for (int x=0; x<students.Count(); x++)
+                {
+                    StudentEnrollmentDataModel studentEnrollment = new StudentEnrollmentDataModel();
+                    studentEnrollment.enrollment = new List<Enrollment>();
+                    string ID = students[x].Id;
+                    studentEnrollment.Id = ID;
+                    studentEnrollment.UniversityID = students[x].UniversityID;
+                    studentEnrollment.StudentNumber = students[x].StudentNumber;
+                    studentEnrollment.StudentEmail = students[x].StudentEmail;
+                    studentEnrollment.EnrolledYear = students[x].EnrolledYear;
+                    studentEnrollment.TotalCreditsEarned = students[x].TotalCreditsEarned;
+                    studentEnrollment.StudentGPA = students[x].StudentGPA;
+                    studentEnrollment.StudentName = students[x].StudentName;
+                    studentEnrollment.StudentDateOfBirth = students[x].StudentDateOfBirth;
+                    studentEnrollment.StudentPhoneNumber = students[x].StudentPhoneNumber;
+                    studentEnrollment.StudentAddress = students[x].StudentAddress;
+                    studentEnrollment.StudentPostalCode = students[x].StudentPostalCode;
+                    studentEnrollment.IsDeleted = students[x].IsDeleted;
+                    List<Enrollment> listEnrollment= await _enrollment.Find(Enrollment => Enrollment.IsDeleted == false && Enrollment.studentID.Equals(ID)).ToListAsync();
+
+                    foreach (var data in listEnrollment)
+                    {
+                        studentEnrollment.enrollment.Add(data);
+                    }
+                    studentEnrollments.Add(studentEnrollment);
+                }
+                return studentEnrollments;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error When Running Test Cases");
+            }
+
         }
     }
 }

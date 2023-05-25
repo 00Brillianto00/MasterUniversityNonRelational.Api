@@ -1,7 +1,9 @@
 ﻿using MasterUniversityNonRelational.Api.Interfaces;
 using MasterUniversityNonRelational.Api.Models;
 using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
 
@@ -156,7 +158,7 @@ namespace MasterUniversityNonRelational.Api.Services
             List<Student> NewStudentData = new List<Student>();
             try
             {
-                studentData = _student.Find(student => true && student.IsDeleted.Equals(false)).Limit(testCase).ToList();
+                studentData = await TestStudentGet(testCase);
             }
             catch (Exception ex)
             {
@@ -189,6 +191,21 @@ namespace MasterUniversityNonRelational.Api.Services
                     NewStudentData.Add(studentData[x]);
             }
             return NewStudentData;
+        }
+
+        public async Task<List<Student>> TestStudentGet(int testCase)
+        {
+
+            List<Student> studentData = new List<Student>();
+            try
+            {
+                studentData = await _student.Find(student => true && student.IsDeleted.Equals(false)).SortBy(student => student.StudentNumber).Limit(testCase).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error When Retrieving Data");
+            }
+            return studentData;
         }
 
         public async Task<string> TestCase(Student studentData, int testCases)

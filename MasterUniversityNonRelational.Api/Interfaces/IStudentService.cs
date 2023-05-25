@@ -12,5 +12,6 @@ namespace MasterUniversityNonRelational.Api.Interfaces
         Task <string> TestCase(Student studentData, int testCases);
         Task<List<Student>> TestStudentInsert(int testCases, List<UniversityData> universities);
         Task<List<Student>> TestStudentUpdate(int testCase);
+        Task<List<Student>> TestStudentGet(int testCase);
     }
 }

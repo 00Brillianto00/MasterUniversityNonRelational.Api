@@ -81,7 +81,7 @@
 
             stopwatch.Start();
 
-            var updatedStudents = await _studentService.TestStudentUpdate(testCases);
+            var updatedStudents = await _studentService.TestStudentUpdate(studentDataNom);
 
             var enrollments = await _enrollmentService.TestEnrollmentUpdate(enrollmentDataNom, universities, lecturers, courses, updatedStudents);
 
@@ -92,8 +92,81 @@
             return Ok(result);
         }
 
+        [HttpGet("testGet/{testCases}")]
+        public async Task<ActionResult<TestResultData>> TestGet(int testCases)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            TestResultData result = new TestResultData();
+            int studentDataNom = testCases / 100;
+            int enrollmentDataNom = 10;
 
 
+            //var getCourses = await _courseService.GetAllAsync();
+            //List<Courses> courses = getCourses.ToList();
+
+            //var getLecturers = await _lecturerService.GetAllAsync();
+            //List<Lecturer> lecturers = getLecturers.ToList();
+
+            //var getUniv = await _universityService.GetAllAsync();
+            //List<UniversityData> universities = getUniv.ToList();
+
+            stopwatch.Start();
+
+            var students = await _studentService.TestStudentGet(studentDataNom);
+
+            var enrollments = await _enrollmentService.TestEnrollmentGet(enrollmentDataNom,students);
+
+            stopwatch.Stop();
+
+            result = getTestResult(stopwatch, testCases);
+
+            return Ok(result);
+        }
+
+        [HttpGet("testGetReturnObject/{testCases}")]
+        public async Task<ActionResult<List<StudentEnrollmentDataModel>>> TestGetObject(int testCases)
+        {
+            int studentDataNom = testCases / 100;
+            int enrollmentDataNom = 10;
+
+            var students = await _studentService.TestStudentGet(studentDataNom);
+
+            var result = await _enrollmentService.TestEnrollmentGet(enrollmentDataNom, students);
+
+            
+            return Ok(result);
+        }
+
+        //[HttpDelete("testDelete/{testCases}")]
+        //public async Task<ActionResult<TestResultData>> TestDelete(int testCases)
+        //{
+        //    Stopwatch stopwatch = new Stopwatch();
+        //    TestResultData result = new TestResultData();
+        //    int studentDataNom = testCases / 100;
+        //    int enrollmentDataNom = 10;
+
+
+        //    var getCourses = await _courseService.GetAllAsync();
+        //    List<Courses> courses = getCourses.ToList();
+
+        //    var getLecturers = await _lecturerService.GetAllAsync();
+        //    List<Lecturer> lecturers = getLecturers.ToList();
+
+        //    var getUniv = await _universityService.GetAllAsync();
+        //    List<UniversityData> universities = getUniv.ToList();
+
+        //    stopwatch.Start();
+
+        //    var updatedStudents = await _studentService.TestStudentUpdate(testCases);
+
+        //    var enrollments = await _enrollmentService.TestEnrollmentGet(enrollmentDataNom, universities, lecturers, courses, updatedStudents);
+
+        //    stopwatch.Stop();
+
+        //    result = getTestResult(stopwatch, testCases);
+
+        //    return Ok(result);
+        //}
 
 
         private TestResultData getTestResult(Stopwatch stopWatch, int testCases)
