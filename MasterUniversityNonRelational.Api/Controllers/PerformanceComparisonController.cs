@@ -123,19 +123,19 @@
             return Ok(result);
         }
 
-        [HttpGet("testGetReturnObject/{testCases}")]
-        public async Task<ActionResult<List<StudentEnrollmentDataModel>>> TestGetObject(int testCases)
-        {
-            int studentDataNom = testCases / 100;
-            int enrollmentDataNom = 10;
+        //[HttpGet("testGetReturnObject/{testCases}")]
+        //public async Task<ActionResult<List<StudentEnrollmentDataModel>>> TestGetObject(int testCases)
+        //{
+        //    int studentDataNom = testCases / 100;
+        //    int enrollmentDataNom = 10;
 
-            var students = await _studentService.TestStudentGet(studentDataNom);
+        //    var students = await _studentService.TestStudentGet(studentDataNom);
 
-            var result = await _enrollmentService.TestEnrollmentGet(enrollmentDataNom, students);
+        //    var result = await _enrollmentService.TestEnrollmentGet(enrollmentDataNom, students);
 
             
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         [HttpDelete("testDelete/{testCases}")]
         public async Task<ActionResult<TestResultData>> TestDelete(int testCases)
@@ -173,16 +173,16 @@
             double seconds = (stopWatch.ElapsedMilliseconds / 1000.00);
             double averages;
             string averageDesc;
-            if (result.Seconds == 0)
-            {
+            //if (result.Seconds == 0)
+            //{
+            //}
                 averages = result.DataProcessed / (seconds * 1000.00);
                 averageDesc = " Datas per Milisecond";
-            }
-            else
-            {
-                averages = result.DataProcessed / seconds;
-                averageDesc = " Datas per Second";
-            }
+            //else
+            //{
+            //    averages = result.DataProcessed / seconds;
+            //    averageDesc = " Datas per Second";
+            //}
             result.AverageTime = "Averaging about " + averages.ToString("0.##") + averageDesc;
             return result;
         }

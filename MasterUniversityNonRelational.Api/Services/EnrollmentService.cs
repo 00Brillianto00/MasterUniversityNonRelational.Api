@@ -198,13 +198,13 @@ namespace MasterUniversityNonRelational.Api.Services
                     for (int z = 0; z<enrollmentHeader.enrollmentDetail.Count(); z++)
                     {
                         string ID = courses[rng.Next(0, courses.Count)].Id;
-                        enrollmentHeader.enrollmentDetail[x].CourseID = ID;
-                        enrollmentHeader.enrollmentDetail[x].LecturerID = lecturers[rng.Next(0, lecturers.Count)].Id;
-                        enrollmentHeader.enrollmentDetail[x].AssignmentScore = rng.Next(1, 100);
-                        enrollmentHeader.enrollmentDetail[x].MidExamScore = rng.Next(1, 100);
-                        enrollmentHeader.enrollmentDetail[x].FinalExamScore = rng.Next(1, 100);
-                        enrollmentHeader.enrollmentDetail[x].CourseAverageScore = (enrollmentHeader.enrollmentDetail[x].AssignmentScore + 
-                            enrollmentHeader.enrollmentDetail[x].MidExamScore + enrollmentHeader.enrollmentDetail[x].FinalExamScore) / 3.0;
+                        enrollmentHeader.enrollmentDetail[z].CourseID = ID;
+                        enrollmentHeader.enrollmentDetail[z].LecturerID = lecturers[rng.Next(0, lecturers.Count)].Id;
+                        enrollmentHeader.enrollmentDetail[z].AssignmentScore = rng.Next(1, 100);
+                        enrollmentHeader.enrollmentDetail[z].MidExamScore = rng.Next(1, 100);
+                        enrollmentHeader.enrollmentDetail[z].FinalExamScore = rng.Next(1, 100);
+                        enrollmentHeader.enrollmentDetail[z].CourseAverageScore = (enrollmentHeader.enrollmentDetail[x].AssignmentScore + 
+                            enrollmentHeader.enrollmentDetail[z].MidExamScore + enrollmentHeader.enrollmentDetail[x].FinalExamScore) / 3.0;
                         Courses data = await _courseService.GetByIdStringAsync(ID);
                         countCourse++;
                         countAverages = countAverages + enrollmentHeader.enrollmentDetail[x].CourseAverageScore;
