@@ -203,11 +203,11 @@ namespace MasterUniversityNonRelational.Api.Services
                         enrollmentHeader.enrollmentDetail[z].AssignmentScore = rng.Next(1, 100);
                         enrollmentHeader.enrollmentDetail[z].MidExamScore = rng.Next(1, 100);
                         enrollmentHeader.enrollmentDetail[z].FinalExamScore = rng.Next(1, 100);
-                        enrollmentHeader.enrollmentDetail[z].CourseAverageScore = (enrollmentHeader.enrollmentDetail[x].AssignmentScore + 
-                            enrollmentHeader.enrollmentDetail[z].MidExamScore + enrollmentHeader.enrollmentDetail[x].FinalExamScore) / 3.0;
+                        enrollmentHeader.enrollmentDetail[z].CourseAverageScore = (enrollmentHeader.enrollmentDetail[z].AssignmentScore + 
+                            enrollmentHeader.enrollmentDetail[z].MidExamScore + enrollmentHeader.enrollmentDetail[z].FinalExamScore) / 3.0;
                         Courses data = await _courseService.GetByIdStringAsync(ID);
                         countCourse++;
-                        countAverages = countAverages + enrollmentHeader.enrollmentDetail[x].CourseAverageScore;
+                        countAverages = countAverages + enrollmentHeader.enrollmentDetail[z].CourseAverageScore;
                         countCost = countCost + data.Cost;
                         countCredit= countCredit + data.Credit;
                     }
