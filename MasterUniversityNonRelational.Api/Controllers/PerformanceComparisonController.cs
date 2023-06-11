@@ -212,7 +212,7 @@
             result.Minutes = stopWatch.Elapsed.Minutes;
             result.Seconds = stopWatch.Elapsed.Seconds;
             result.MiliSeconds = stopWatch.Elapsed.Milliseconds;
-            double miliseconds = stopWatch.Elapsed.Milliseconds * 1.0;
+            double miliseconds = stopWatch.ElapsedMilliseconds* 1.0;
             result.AverageTime= miliseconds/result.DataProcessed;
             return result;
         }
