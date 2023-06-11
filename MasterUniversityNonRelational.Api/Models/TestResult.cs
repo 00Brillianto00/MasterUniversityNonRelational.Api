@@ -10,12 +10,20 @@ namespace MasterUniversityNonRelational.Api.Models
     [BsonIgnoreExtraElements]
     public class TestResultData
     {
+        [BsonId]
+        public int ID { get; set; }
+        [BsonElement("hours")]
         public int Hours { get; set; }
+        [BsonElement("minutes")]
         public int Minutes { get; set; }
+        [BsonElement("seconds")]
         public int Seconds { get; set; }
+        [BsonElement("miliseconds")]
         public int MiliSeconds { get; set; }
+        [BsonElement("dataProcessed")]
         public int DataProcessed { get; set; }
-        public string AverageTime { get; set; }
+        [BsonElement("averageTime")]
+        public double AverageTime { get; set; }
 
     }
 

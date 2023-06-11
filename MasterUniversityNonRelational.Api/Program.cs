@@ -1,3 +1,4 @@
+using MasterUniversityNonRelational.Api.Controllers;
 using MasterUniversityNonRelational.Api.Interfaces;
 using MasterUniversityNonRelational.Api.Models;
 using MasterUniversityNonRelational.Api.Services;
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ILecturerService, LecturerService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IPerformanceTestInsertService, PerformanceTestInsertService>();
 //builder.Services.AddScoped<IPerformanceComparisonService>();
 
 builder.Services.AddControllers();
