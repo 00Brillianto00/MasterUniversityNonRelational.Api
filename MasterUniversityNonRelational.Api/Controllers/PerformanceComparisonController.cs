@@ -8,6 +8,7 @@
     using Microsoft.AspNetCore.Mvc;
     using MasterUniversityNonRelational.Api.Services;
     using System.Diagnostics;
+    using NUnit.Framework;
 
     [Route("api/[controller]")]
     [Produces("application/json")]
@@ -21,9 +22,17 @@
         private readonly ILecturerService _lecturerService;
         private readonly IUniversityService _universityService;
         private readonly IPerformanceTestInsertService _performanceTestInsertService;
+        private readonly IPerformanceTestGetService _performanceTestGetService;
+        private readonly IPerformanceTestUpdateService _performanceTestUpdateService;
+        private readonly IPerformanceTestDeleteService _performanceTestDeleteService;
 
         public PerformanceComparisonController(IStudentService studentService, 
-            IEnrollmentService enrollmentService, ICourseService courseService, ILecturerService lecturerService, IUniversityService universityService , IPerformanceTestInsertService performanceTestInsertService)
+            IEnrollmentService enrollmentService, ICourseService courseService, ILecturerService lecturerService, 
+            IUniversityService universityService , 
+            IPerformanceTestInsertService performanceTestInsertService,
+            IPerformanceTestGetService performanceTestGetService,
+            IPerformanceTestUpdateService performanceTestUpdateService,
+            IPerformanceTestDeleteService performanceTestDeleteService)
         {
             //this._performanceComparisonService = performanceComparisonService;
             this._studentService = studentService;
@@ -32,6 +41,9 @@
             this._lecturerService = lecturerService;
             this._universityService = universityService;
             this._performanceTestInsertService = performanceTestInsertService;
+            this._performanceTestGetService = performanceTestGetService;
+            this._performanceTestUpdateService = performanceTestUpdateService;
+            this._performanceTestDeleteService = performanceTestDeleteService;
         }
 
         [HttpPost("testInsert/{testCases}")]
@@ -87,13 +99,14 @@
 
             var updatedStudents = await _studentService.TestStudentUpdate(studentDataNom);
 
-            var enrollments = await _enrollmentService.TestEnrollmentUpdate(enrollmentDataNom, universities, lecturers, courses, updatedStudents);
+            var enrollments = await _enrollmentService.TestEnrollmentUpdate(enrollmentDataNom, universities, lecturers, courses, updatedStudents, testCases);
 
             stopwatch.Stop();
 
             result = getTestResult(stopwatch, testCases);
+            var testResult = await _performanceTestUpdateService.SavePerformanceTestData(result);
 
-            return Ok(result);
+            return Ok(testResult);
         }
 
         [HttpGet("testGet/{testCases}")]
@@ -113,8 +126,9 @@
             stopwatch.Stop();
 
             result = getTestResult(stopwatch, testCases);
+            var testResult = await _performanceTestGetService.SavePerformanceTestData(result);
 
-            return Ok(result);
+            return Ok(testResult);
         }
 
         //[HttpGet("testGetReturnObject/{testCases}")]
@@ -137,11 +151,14 @@
             Stopwatch stopwatch = new Stopwatch();
             TestResultData result = new TestResultData();
             int studentDataNom = testCases / 100;
-            int enrollmentDataNom = 10;
-
+            int enrollmentDataNom = 10;;
             stopwatch.Start();
 
             var students = await _studentService.TestStudentGet(studentDataNom);
+            if(students.Count < studentDataNom )
+            {
+                throw new Exception("Not Enough Datas in Database, Please Repopulate Datas.");
+            }
             var tes = await _studentService.TestStudentDelete(studentDataNom, students);
             var tes2 = await _enrollmentService.TestEnrollmentDelete(students);
 
@@ -151,8 +168,9 @@
             }
 
             result = getTestResult(stopwatch, testCases);
+            var testResult = await _performanceTestDeleteService.SavePerformanceTestData(result);
 
-            return Ok(result);
+            return Ok(testResult);
         }
 
         [HttpGet("GetTopInsertData/{topData}")]
@@ -161,6 +179,29 @@
         {
             var result = await _performanceTestInsertService.GetTopPerformanceTestData(topData);
             return Ok(result);
+        }
+
+        [HttpGet("GetTopUpdateData/{topData}")]
+
+        public async Task<ActionResult<IEnumerable<TestResultData>>> GetTopUpdateData(int topData)
+        {
+            var result = await _performanceTestUpdateService.GetTopPerformanceTestData(topData);
+            return Ok(result);
+        }
+        [HttpGet("GetTopGetData/{topData}")]
+
+        public async Task<ActionResult<IEnumerable<TestResultData>>> GetTopGetData(int topData)
+        {
+            var result = await _performanceTestGetService.GetTopPerformanceTestData(topData);
+            return Ok(result);
+        }
+        [HttpGet("GetTopDeleteData/{topData}")]
+
+        public async Task<ActionResult<IEnumerable<TestResultData>>> GetTopDeleteData(int topData)
+        {
+            var result = await _performanceTestDeleteService.GetTopPerformanceTestData(topData);
+            return Ok(result);
+
         }
 
         private TestResultData getTestResult(Stopwatch stopWatch, int testCases)

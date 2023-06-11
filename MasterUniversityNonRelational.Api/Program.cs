@@ -24,8 +24,9 @@ builder.Services.AddScoped<ILecturerService, LecturerService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IPerformanceTestInsertService, PerformanceTestInsertService>();
-//builder.Services.AddScoped<IPerformanceComparisonService>();
-
+builder.Services.AddScoped<IPerformanceTestUpdateService, PerformanceTestUpdateService>();
+builder.Services.AddScoped<IPerformanceTestGetService, PerformanceTestGetService>();
+builder.Services.AddScoped<IPerformanceTestDeleteService, PerformanceTestDeleteService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

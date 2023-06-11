@@ -165,6 +165,11 @@ namespace MasterUniversityNonRelational.Api.Services
                 throw new Exception("Error When Retrieving Data");
             }
 
+            if(studentData.Count() < testCase)
+            {
+                throw new Exception("Not Enough Datas in Database, Please Repopulate Datas.");
+            }
+
             long StudentNumber = rng.NextInt64(1000000000, 9999999999);
             string firstName = "UPDATED_StudentFirstName";
             string middleName = "UPDATED_StudentMiddleName";
