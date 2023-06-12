@@ -1,4 +1,5 @@
 ﻿using MasterUniversityNonRelational.Api.Models;
+using System.Diagnostics;
 
 namespace MasterUniversityNonRelational.Api.Interfaces
 {
@@ -10,7 +11,7 @@ namespace MasterUniversityNonRelational.Api.Interfaces
         Task<Enrollment> Update(String Id, Enrollment branchData);
         Task<bool> Delete(Guid id);
         Task<List<Enrollment>> TestEnrollmentInsert(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student> students);
-        Task<List<Enrollment>> TestEnrollmentUpdate(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student> students, int totalNeededDoc);
+        Task<Stopwatch> TestEnrollmentUpdate(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student> students, int totalNeededDoc);
         Task<List<StudentEnrollmentDataModel>> TestEnrollmentGet(int testCases, List<Student> students);
         Task<bool> TestEnrollmentDelete(List<Student> students);
     }

@@ -175,8 +175,9 @@ namespace MasterUniversityNonRelational.Api.Services
             }
         }
 
-        public async Task<List<Enrollment>> TestEnrollmentUpdate(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student> students, int totalNeedDoc)
+        public async Task<Stopwatch> TestEnrollmentUpdate(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student> students, int totalNeedDoc)
         {
+            Stopwatch stopwatch = new Stopwatch();
             try
             {
                 List<Enrollment> newEnrollments = new List<Enrollment>();
@@ -188,6 +189,7 @@ namespace MasterUniversityNonRelational.Api.Services
                     {
                         for(int y=0; y<enrollmentHeader.Count(); y++)
                         {
+                            stopwatch.Start();
                             enrollmentHeader[y].IsDeleted = false;
                             string enrollID = enrollmentHeader[y].Id;
                             //enrollmentHeader.GPAPerSemester = 0;
@@ -231,8 +233,9 @@ namespace MasterUniversityNonRelational.Api.Services
                     {
                         throw new Exception("Not Enough Datas in Database, Please Repopulate Datas.");
                     }
+                    stopwatch.Stop();
                 }
-                return newEnrollments;
+                return stopwatch;
             }
             catch (Exception ex)
             {

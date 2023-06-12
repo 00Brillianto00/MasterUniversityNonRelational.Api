@@ -151,19 +151,9 @@ namespace MasterUniversityNonRelational.Api.Services
             }
         }
 
-        public async Task<List<Student>> TestStudentUpdate(int testCase)
+        public async Task<List<Student>> TestStudentUpdate(int testCase, List<Student> studentData)
         {
-
-            List<Student> studentData = new List<Student>();
             List<Student> NewStudentData = new List<Student>();
-            try
-            {
-                studentData = await TestStudentGet(testCase);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error When Retrieving Data");
-            }
 
             if(studentData.Count() < testCase)
             {

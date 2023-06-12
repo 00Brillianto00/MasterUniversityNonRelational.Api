@@ -11,7 +11,7 @@ namespace MasterUniversityNonRelational.Api.Interfaces
         Task<bool> Delete(Guid id);
         Task <string> TestCase(Student studentData, int testCases);
         Task<List<Student>> TestStudentInsert(int testCases, List<UniversityData> universities);
-        Task<List<Student>> TestStudentUpdate(int testCase);
+        Task<List<Student>> TestStudentUpdate(int testCase, List<Student> oldStudentData);
         Task<List<Student>> TestStudentGet(int testCase);
         Task<bool> TestStudentDelete(int testCase, List<Student> studentData);
     }

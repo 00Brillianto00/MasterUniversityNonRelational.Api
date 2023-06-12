@@ -82,29 +82,61 @@
         {
             Stopwatch stopwatch = new Stopwatch();
             TestResultData result = new TestResultData();
-            int studentDataNom = testCases / 100;
+            TestResultData result2 = new TestResultData();
+            TestResultData total = new TestResultData();
             int enrollmentDataNom = 10;
-
+            int studentDataNom = testCases / 100;
+            double count;
+            double roundDown;
 
             var getCourses = await _courseService.GetAllAsync();
             List<Courses> courses = getCourses.ToList();
-
             var getLecturers = await _lecturerService.GetAllAsync();
             List<Lecturer> lecturers = getLecturers.ToList();
-
             var getUniv = await _universityService.GetAllAsync();
             List<UniversityData> universities = getUniv.ToList();
+            List<Student> oldStudentDatas = await _studentService.TestStudentGet(studentDataNom);
 
+            if (oldStudentDatas.Count() != studentDataNom)
+            {
+                throw new Exception("Not Enough Datas in Database, Please Repopulate Database by Inserting Datas");
+
+            }
             stopwatch.Start();
-
-            var updatedStudents = await _studentService.TestStudentUpdate(studentDataNom);
-
-            var enrollments = await _enrollmentService.TestEnrollmentUpdate(enrollmentDataNom, universities, lecturers, courses, updatedStudents, testCases);
-
+            var updatedStudents = await _studentService.TestStudentUpdate(studentDataNom,oldStudentDatas);
             stopwatch.Stop();
-
             result = getTestResult(stopwatch, testCases);
-            var testResult = await _performanceTestUpdateService.SavePerformanceTestData(result);
+
+            var enrollStopwatch = await _enrollmentService.TestEnrollmentUpdate(enrollmentDataNom, universities, lecturers, courses, updatedStudents, testCases);
+            result2 = getTestResult(enrollStopwatch, testCases);
+            
+            //milis
+            total.MiliSeconds = result.MiliSeconds +result2.MiliSeconds;
+            if (total.MiliSeconds > 1000)
+            {
+                count = total.MiliSeconds / 1000;
+                roundDown = Math.Floor(count * 100) / 100;
+
+                int storeSeconds = (int)roundDown;
+
+                total.MiliSeconds = total.MiliSeconds - 1000;
+                total.Seconds = total.Seconds + storeSeconds;
+            }
+
+            //secs
+            total.Seconds = total.Seconds + result.Seconds +result2.Seconds;
+            if (total.MiliSeconds > 60)
+            {
+                count = total.Seconds / 60;
+                roundDown = Math.Floor(count * 100) / 100;
+                int storeMinutes = (int)roundDown;
+                total.Seconds = total.Seconds - 60;
+                total.Minutes = total.Minutes + storeMinutes;
+            }
+
+            total.Minutes = total.Minutes+ result.Minutes + result2.Minutes;
+            total.Hours = result.Hours + result2.Hours;
+            var testResult = await _performanceTestUpdateService.SavePerformanceTestData(total);
 
             return Ok(testResult);
         }
@@ -152,13 +184,13 @@
             TestResultData result = new TestResultData();
             int studentDataNom = testCases / 100;
             int enrollmentDataNom = 10;;
-            stopwatch.Start();
 
             var students = await _studentService.TestStudentGet(studentDataNom);
             if(students.Count < studentDataNom )
             {
                 throw new Exception("Not Enough Datas in Database, Please Repopulate Datas.");
             }
+            stopwatch.Start();
             var tes = await _studentService.TestStudentDelete(studentDataNom, students);
             var tes2 = await _enrollmentService.TestEnrollmentDelete(students);
 
