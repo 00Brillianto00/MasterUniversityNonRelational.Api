@@ -210,8 +210,13 @@ namespace MasterUniversityNonRelational.Api.Services
                 int count = 0;
                 foreach (var data in studentData)
                 {
-                    await _student.DeleteOneAsync(studentData => studentData.Id.Equals(data.Id));
+                    //optimize
+                    var deleteFilter = Builders<Student>.Filter.Eq(x => x.Id, data.Id);
+                    await _student.DeleteManyAsync(deleteFilter);
                     count++;
+
+                    //await _student.DeleteOneAsync(studentData => studentData.Id.Equals(data.Id));
+                    //count++;
                 }
                 return true;
             }

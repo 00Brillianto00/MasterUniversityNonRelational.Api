@@ -9,6 +9,7 @@
     using MasterUniversityNonRelational.Api.Services;
     using System.Diagnostics;
     using NUnit.Framework;
+    using NUnit.Framework.Internal;
 
     [Route("api/[controller]")]
     [Produces("application/json")]
@@ -49,46 +50,39 @@
         [HttpPost("testInsert/{testCases}")]
         public async Task<ActionResult<TestResultData>> TestSave(int testCases)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            TestResultData result = new TestResultData();
             int studentDataNom = testCases/100; 
             int enrollmentDataNom = 10 ;
-
-
             var getCourses = await _courseService.GetAllAsync();
             List<Courses> courses = getCourses.ToList();
-
+            TestResultData testResult = new TestResultData();
             var getLecturers = await _lecturerService.GetAllAsync();
             List<Lecturer> lecturers = getLecturers.ToList();
 
             var getUniv = await _universityService.GetAllAsync();
             List<UniversityData> universities = getUniv.ToList();
+            //for (int x=0; x<10; x++)
+            //{
+                Stopwatch stopwatch = new Stopwatch();
+                TestResultData result = new TestResultData();
+                stopwatch.Start();
+                //var students = await _studentService.TestStudentInsert(studentDataNom, universities);
+                var enrollments = await _enrollmentService.TestEnrollmentInsert(enrollmentDataNom, universities, lecturers, courses, studentDataNom); 
+                stopwatch.Stop();
 
-            stopwatch.Start();
-            var students = await _studentService.TestStudentInsert(studentDataNom, universities);
-
-            var enrollments = await _enrollmentService.TestEnrollmentInsert(enrollmentDataNom, universities, lecturers, courses, students); 
-            stopwatch.Stop();
-
-            result = getTestResult(stopwatch, testCases);
+                result = getTestResult(stopwatch, testCases);
             
-            var testResult = await _performanceTestInsertService.SavePerformanceTestData(result);
-           
+                testResult = await _performanceTestInsertService.SavePerformanceTestData(result);
+               //await TestDelete(testCases);
+            //}
             return Ok(testResult);
         }
 
         [HttpPut("testUpdate/{testCases}")]
         public async Task<ActionResult<TestResultData>> TestUpdate(int testCases)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            TestResultData result = new TestResultData();
-            TestResultData result2 = new TestResultData();
-            TestResultData total = new TestResultData();
             int enrollmentDataNom = 10;
             int studentDataNom = testCases / 100;
-            double count;
-            double roundDown;
-
+            TestResultData testResult = new TestResultData();
             var getCourses = await _courseService.GetAllAsync();
             List<Courses> courses = getCourses.ToList();
             var getLecturers = await _lecturerService.GetAllAsync();
@@ -102,41 +96,55 @@
                 throw new Exception("Not Enough Datas in Database, Please Repopulate Database by Inserting Datas");
 
             }
-            stopwatch.Start();
-            var updatedStudents = await _studentService.TestStudentUpdate(studentDataNom,oldStudentDatas);
-            stopwatch.Stop();
-            result = getTestResult(stopwatch, testCases);
+            //for (int x = 0; x < 10; x++)
+            //{
 
-            var enrollStopwatch = await _enrollmentService.TestEnrollmentUpdate(enrollmentDataNom, universities, lecturers, courses, updatedStudents, testCases);
-            result2 = getTestResult(enrollStopwatch, testCases);
+                TestResultData result = new TestResultData();
+                TestResultData result2 = new TestResultData();
+                TestResultData total = new TestResultData();
+                Stopwatch stopwatch = new Stopwatch();
+                Stopwatch stopwatch2 = new Stopwatch();
+                double count = 0;
+                double roundDown =0;
+
+                stopwatch.Start();
+                var updatedStudents = await _studentService.TestStudentUpdate(studentDataNom,oldStudentDatas);
+                stopwatch.Stop();
+                result = getTestResult(stopwatch, testCases);
             
-            //milis
-            total.MiliSeconds = result.MiliSeconds +result2.MiliSeconds;
-            if (total.MiliSeconds > 1000)
-            {
-                count = total.MiliSeconds / 1000;
-                roundDown = Math.Floor(count * 100) / 100;
+                stopwatch2.Start();
+                var enrollStopwatch = await _enrollmentService.TestEnrollmentUpdate(enrollmentDataNom, universities, lecturers, courses, updatedStudents, testCases);
+                result2 = getTestResult(enrollStopwatch, testCases);
+                stopwatch2.Stop();
+                //milis
+                total.MiliSeconds = result.MiliSeconds +result2.MiliSeconds;
+                if (total.MiliSeconds > 1000)
+                {
+                    count = total.MiliSeconds / 1000;
+                    roundDown = Math.Floor(count * 100) / 100;
+                    int storeSeconds = (int)roundDown;
+                    total.MiliSeconds = total.MiliSeconds - 1000;
+                    total.Seconds = total.Seconds + storeSeconds;
+                }
 
-                int storeSeconds = (int)roundDown;
-
-                total.MiliSeconds = total.MiliSeconds - 1000;
-                total.Seconds = total.Seconds + storeSeconds;
-            }
-
-            //secs
-            total.Seconds = total.Seconds + result.Seconds +result2.Seconds;
-            if (total.MiliSeconds > 60)
-            {
-                count = total.Seconds / 60;
-                roundDown = Math.Floor(count * 100) / 100;
-                int storeMinutes = (int)roundDown;
-                total.Seconds = total.Seconds - 60;
-                total.Minutes = total.Minutes + storeMinutes;
-            }
-
-            total.Minutes = total.Minutes+ result.Minutes + result2.Minutes;
-            total.Hours = result.Hours + result2.Hours;
-            var testResult = await _performanceTestUpdateService.SavePerformanceTestData(total);
+                //secs
+                total.Seconds = total.Seconds + result.Seconds +result2.Seconds;
+                if (total.Seconds > 60)
+                {
+                    count = total.Seconds / 60;
+                    roundDown = Math.Floor(count * 100) / 100;
+                    int storeMinutes = (int)roundDown;
+                    total.Seconds = total.Seconds - 60;
+                    total.Minutes = total.Minutes + storeMinutes;
+                }
+                total.DataProcessed = testCases;
+                total.Minutes = total.Minutes+ result.Minutes + result2.Minutes;
+                total.Hours = result.Hours + result2.Hours;
+                long totalMilis = stopwatch.ElapsedMilliseconds + enrollStopwatch.ElapsedMilliseconds;
+                double miliseconds = totalMilis * 1.0;
+                total.AverageTime = miliseconds / total.DataProcessed;
+                testResult = await _performanceTestUpdateService.SavePerformanceTestData(total);
+            //}
 
             return Ok(testResult);
         }
@@ -144,21 +152,24 @@
         [HttpGet("testGet/{testCases}")]
         public async Task<ActionResult<TestResultData>> TestGet(int testCases)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            TestResultData result = new TestResultData();
             int studentDataNom = testCases / 100;
             int enrollmentDataNom = 10;
+            TestResultData testResult = new TestResultData();
+            //for (int x=0; x<10; x++)
+            //{
+                TestResultData result = new TestResultData();
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-            stopwatch.Start();
+                var students = await _studentService.TestStudentGet(studentDataNom);
 
-            var students = await _studentService.TestStudentGet(studentDataNom);
+                var enrollments = await _enrollmentService.TestEnrollmentGet(enrollmentDataNom,students);
 
-            var enrollments = await _enrollmentService.TestEnrollmentGet(enrollmentDataNom,students);
+                stopwatch.Stop();
 
-            stopwatch.Stop();
-
-            result = getTestResult(stopwatch, testCases);
-            var testResult = await _performanceTestGetService.SavePerformanceTestData(result);
+                result = getTestResult(stopwatch, testCases);
+                testResult = await _performanceTestGetService.SavePerformanceTestData(result);
+            //}
 
             return Ok(testResult);
         }

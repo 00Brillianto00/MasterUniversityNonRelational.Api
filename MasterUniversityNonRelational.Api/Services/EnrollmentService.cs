@@ -12,19 +12,25 @@ namespace MasterUniversityNonRelational.Api.Services
     {
         private readonly IMongoCollection<Enrollment> _enrollment;
         private readonly IMongoCollection<Courses> _courses;
+        private readonly IMongoCollection<Student> _students;
         private Random rng = new Random();
         private readonly ICourseService _courseService;
+        private readonly IStudentService _studentService;
 
-        public EnrollmentService(IMongoClient mongoDBClient, IDatabaseSettings databaseSettings, ICourseService courseService)
+        public EnrollmentService(IMongoClient mongoDBClient, IDatabaseSettings databaseSettings, ICourseService courseService, IStudentService studentService)
         {
 
             var database = mongoDBClient.GetDatabase(databaseSettings.DatabaseName);
             databaseSettings.CollectionName = "Enrollment";
             _enrollment = database.GetCollection<Enrollment>(databaseSettings.CollectionName);
+            
             databaseSettings.CollectionName = "Courses";
             _courses = database.GetCollection<Courses>(databaseSettings.CollectionName);
-            this._courseService= courseService; 
+            this._courseService = courseService;
             
+            databaseSettings.CollectionName = "Student";
+            _students = database.GetCollection<Student>(databaseSettings.CollectionName);
+            this._studentService = studentService;
         }
 
         public async Task<IEnumerable<Enrollment>> GetAllAsync()
@@ -119,14 +125,42 @@ namespace MasterUniversityNonRelational.Api.Services
             }
         }
 
-        public async Task<List<Enrollment>> TestEnrollmentInsert(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student>students)
+        public async Task<List<Enrollment>> TestEnrollmentInsert(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses,int studentNom)
         {
-            List<Enrollment> enrollments = new List<Enrollment>();
+            List<Enrollment> totalEnrollments = new List<Enrollment>();
+            //List<Student> studentDatas = new List<Student>();
+            long StudentNumber = rng.NextInt64(1, 9999999999);
+            string firstName = "StudentFirstName";
+            string middleName = "StudentMiddleName";
+            string lastName = "StudentLastName_";
+            string address = "JL Kemanggisan Raya";
+            string country = "Indonesia";
+            string province = "DKI Jakarta";
+            string city = "Jakarta Barat";
             try
             {
-                for (int x = 0; x < students.Count; x++)
+                for (int x = 0; x < studentNom; x++)
                 {
-                    //50 student
+                    List<Student> studentDatas = new List<Student>();
+                    Student studentData = new Student();
+                    studentData.Id = Guid.NewGuid().ToString();
+                    studentData.UniversityID = universities[rng.Next(0, universities.Count())].Id;
+                    studentData.StudentNumber = StudentNumber++;
+                    string getModifier = studentData.StudentNumber.ToString().Substring(StudentNumber.ToString().Length - 4, 4);
+                    studentData.StudentEmail = firstName + "." + lastName + getModifier + "@Univ.ac.id";
+                    studentData.StudentName = firstName + " " + middleName + " " + lastName + getModifier;
+                    studentData.StudentGPA = rng.NextDouble() * (4.0 - 1.0) + 1.0;
+                    studentData.TotalCreditsEarned = rng.Next(0, 100);
+                    studentData.EnrolledYear = rng.Next(2000, 2023).ToString();
+                    studentData.StudentDateOfBirth = generateDoB();
+                    studentData.StudentPhoneNumber = generatePhoneNum();
+                    studentData.StudentAddress = address + " No." + rng.Next(0, 50) + "," + city + "," + province + "," + country;
+                    studentData.StudentPostalCode = rng.Next(1000, 9999);
+                    studentData.IsDeleted = false;
+                    //await _students.InsertOneAsync(studentData);
+                    studentDatas.Add(studentData);
+
+                    List<Enrollment> enrollments = new List<Enrollment>();
                     for (int y = 0; y < testCases; y++)
                     {
                         //each student should have 10
@@ -134,7 +168,7 @@ namespace MasterUniversityNonRelational.Api.Services
                         enrollmentHeader.enrollmentDetail = new List<EnrollmentDetail>();
                         Guid id = Guid.NewGuid();
                         enrollmentHeader.Id = id.ToString();
-                        enrollmentHeader.studentID = students[x].Id;
+                        enrollmentHeader.studentID = studentData.Id;
                         enrollmentHeader.IsDeleted = false;
                         //enrollmentHeader.GPAPerSemester = 0;
                         enrollmentHeader.TotalCoursePerSemester = 10;
@@ -162,12 +196,15 @@ namespace MasterUniversityNonRelational.Api.Services
                             enrollmentDetail.CourseAverageScore = (enrollmentDetail.AssignmentScore + enrollmentDetail.MidExamScore + enrollmentDetail.FinalExamScore) / 3.0;
                             enrollmentHeader.enrollmentDetail.Add(enrollmentDetail);
                         }
-                        //enrollmentHeader.enrollmentDetail.Add(details);
-                        await _enrollment.InsertOneAsync(enrollmentHeader);
+                        //await _enrollment.InsertOneAsync(enrollmentHeader);
                         enrollments.Add(enrollmentHeader);
+                        totalEnrollments.Add(enrollmentHeader);
+                        //totalEnrollments.Add(enrollmentHeader);
                     }
+                    await _students.InsertManyAsync(studentDatas);
+                    await _enrollment.InsertManyAsync(enrollments);
                 }
-                return enrollments;
+                return totalEnrollments;
             }
             catch (Exception ex)
             {
@@ -178,13 +215,17 @@ namespace MasterUniversityNonRelational.Api.Services
         public async Task<Stopwatch> TestEnrollmentUpdate(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student> students, int totalNeedDoc)
         {
             Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch3 = new Stopwatch();
+            Stopwatch stopwatch2 = new Stopwatch();
             try
             {
                 List<Enrollment> newEnrollments = new List<Enrollment>();
                 for (int x = 0; x < students.Count; x++)
                 {
+                    stopwatch3.Start();  
                     List<Enrollment> enrollmentHeader = await _enrollment.Find(Enrollment => Enrollment.studentID.Equals(students[x].Id) && Enrollment.IsDeleted == false).ToListAsync();
-
+                    stopwatch3.Stop();
+                    stopwatch2.Start();
                     try
                     {
                         for(int y=0; y<enrollmentHeader.Count(); y++)
@@ -234,6 +275,7 @@ namespace MasterUniversityNonRelational.Api.Services
                         throw new Exception("Not Enough Datas in Database, Please Repopulate Datas.");
                     }
                     stopwatch.Stop();
+                    stopwatch2.Stop();
                 }
                 return stopwatch;
             }
@@ -291,9 +333,17 @@ namespace MasterUniversityNonRelational.Api.Services
                 int count = 0;
                 foreach (var data in students)
                 {
+                    //Optimized
                     var deleteFilter = Builders<Enrollment>.Filter.Eq(x => x.studentID, data.Id);
                     await _enrollment.DeleteManyAsync(deleteFilter);
                     count++;
+
+                    //for (int x = 0; x < 10; x++)
+                    ////each students has 10 enrollments
+                    //{
+                    //    await _enrollment.DeleteOneAsync(enrollData => enrollData.studentID.Equals(data.Id));
+                    //    count++;
+                    //}
                 }
                 return true;
             }
@@ -302,6 +352,24 @@ namespace MasterUniversityNonRelational.Api.Services
                 throw new Exception("Error When Running Test Cases");
             }
 
+        }
+
+        private string generatePhoneNum()
+        {
+            string firsTwoDigits = rng.Next(0, 99).ToString("00");
+            string nextFourDigits = rng.Next(0, 1000).ToString("0000");
+            string lastFourDigits = rng.Next(0, 1000).ToString("0000");
+            string phoneNum = "08" + firsTwoDigits + "-" + nextFourDigits + "-" + lastFourDigits;
+            return phoneNum;
+        }
+
+        private DateTime generateDoB()
+        {
+            DateTime startDate = new DateTime(1960, 1, 1);
+            DateTime endDate = new DateTime(2000, 1, 1);
+            int rangeDate = (endDate - startDate).Days;
+            DateTime RandomDay = startDate.AddDays(rng.Next(rangeDate));
+            return RandomDay;
         }
     }
 }
