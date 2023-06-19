@@ -215,22 +215,17 @@ namespace MasterUniversityNonRelational.Api.Services
         public async Task<Stopwatch> TestEnrollmentUpdate(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses, List<Student> students, int totalNeedDoc)
         {
             Stopwatch stopwatch = new Stopwatch();
-            Stopwatch stopwatch3 = new Stopwatch();
-            Stopwatch stopwatch2 = new Stopwatch();
             try
             {
                 List<Enrollment> newEnrollments = new List<Enrollment>();
                 for (int x = 0; x < students.Count; x++)
-                {
-                    stopwatch3.Start();  
+                { 
                     List<Enrollment> enrollmentHeader = await _enrollment.Find(Enrollment => Enrollment.studentID.Equals(students[x].Id) && Enrollment.IsDeleted == false).ToListAsync();
-                    stopwatch3.Stop();
-                    stopwatch2.Start();
                     try
                     {
                         for(int y=0; y<enrollmentHeader.Count(); y++)
                         {
-                            stopwatch.Start();
+                            
                             enrollmentHeader[y].IsDeleted = false;
                             string enrollID = enrollmentHeader[y].Id;
                             //enrollmentHeader.GPAPerSemester = 0;
@@ -266,16 +261,27 @@ namespace MasterUniversityNonRelational.Api.Services
                             enrollmentHeader[y].TotalCreditsPerSemester = countCredit;
                             enrollmentHeader[y].AverageScorePerSemester= (countAverages/countCourse)/1.0;
 
-                            await _enrollment.ReplaceOneAsync(enrollmentData => enrollmentData.Id.Equals(enrollID), enrollmentHeader[y]);
+                            //await _enrollment.ReplaceOneAsync(enrollmentData => enrollmentData.Id.Equals(enrollID), enrollmentHeader[y]);
+
+                            var updateFilter = Builders<Enrollment>.Update
+                                        .Set(x => x.SemesterType, enrollmentHeader[y].SemesterType)
+                                        .Set(x => x.Year, enrollmentHeader[y].Year)
+                                        .Set(x => x.TotalCostPerSemester, enrollmentHeader[y].TotalCostPerSemester)
+                                        .Set(x => x.TotalCreditsPerSemester, enrollmentHeader[y].TotalCreditsPerSemester)
+                                        .Set(x => x.TotalCoursePerSemester, enrollmentHeader[y].TotalCoursePerSemester)
+                                        .Set(x => x.AverageScorePerSemester, enrollmentHeader[y].AverageScorePerSemester)
+                                        .Set(x => x.enrollmentDetail, enrollmentHeader[y].enrollmentDetail);
+                            stopwatch.Start();
+                            var result = await _enrollment.UpdateOneAsync(x => x.Id.Equals(enrollID), updateFilter);
+                            stopwatch.Stop();
                             newEnrollments.Add(enrollmentHeader[y]);
+
                         }
                     }
                     catch(Exception ex)
                     {
                         throw new Exception("Not Enough Datas in Database, Please Repopulate Datas.");
                     }
-                    stopwatch.Stop();
-                    stopwatch2.Stop();
                 }
                 return stopwatch;
             }

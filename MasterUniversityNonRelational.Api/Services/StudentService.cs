@@ -151,9 +151,10 @@ namespace MasterUniversityNonRelational.Api.Services
             }
         }
 
-        public async Task<List<Student>> TestStudentUpdate(int testCase, List<Student> studentData)
+        public async Task<Stopwatch> TestStudentUpdate(int testCase, List<Student> studentData)
         {
             List<Student> NewStudentData = new List<Student>();
+            Stopwatch stopwatch= Stopwatch.StartNew();
 
             if(studentData.Count() < testCase)
             {
@@ -182,10 +183,25 @@ namespace MasterUniversityNonRelational.Api.Services
                     studentData[x].StudentPhoneNumber = generatePhoneNum();
                     studentData[x].StudentAddress = address + " No." +rng.Next(0, 50) + ","+ city+ ","+province+","+country;
                     studentData[x].StudentPostalCode = rng.Next(1000, 9999);
-                    await _student.ReplaceOneAsync(studentData => studentData.Id.Equals(Id), studentData[x]);
-                    NewStudentData.Add(studentData[x]);
+                //await _student.ReplaceOneAsync(studentData => studentData.Id.Equals(Id), studentData[x]);
+
+                var updateFilter = Builders<Student>.Update
+                                   .Set(x => x.StudentEmail, studentData[x].StudentEmail)
+                                   .Set(x => x.StudentName, studentData[x].StudentName)
+                                   .Set(x => x.StudentGPA, studentData[x].StudentGPA)
+                                   .Set(x => x.TotalCreditsEarned, studentData[x].TotalCreditsEarned)
+                                   .Set(x => x.EnrolledYear, studentData[x].EnrolledYear)
+                                   .Set(x => x.StudentDateOfBirth, studentData[x].StudentDateOfBirth)
+                                   .Set(x => x.StudentPhoneNumber, studentData[x].StudentPhoneNumber)
+                                   .Set(x => x.StudentAddress, studentData[x].StudentAddress)
+                                   .Set(x => x.StudentPostalCode, studentData[x].StudentPostalCode);
+               
+                stopwatch.Start();
+                var result = await _student.UpdateOneAsync(x => x.Id.Equals(Id), updateFilter);
+                stopwatch.Stop();
+                NewStudentData.Add(studentData[x]);
             }
-            return NewStudentData;
+            return stopwatch;
         }
 
         public async Task<List<Student>> TestStudentGet(int testCase)

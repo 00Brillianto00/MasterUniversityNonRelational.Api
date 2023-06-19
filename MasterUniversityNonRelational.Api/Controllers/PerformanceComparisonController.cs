@@ -97,7 +97,7 @@
 
             }
             //for (int x = 0; x < 10; x++)
-            //{
+           // {
 
                 TestResultData result = new TestResultData();
                 TestResultData result2 = new TestResultData();
@@ -108,15 +108,17 @@
                 double roundDown =0;
 
                 stopwatch.Start();
-                var updatedStudents = await _studentService.TestStudentUpdate(studentDataNom,oldStudentDatas);
+                var studentStopwatch = await _studentService.TestStudentUpdate(studentDataNom,oldStudentDatas);
                 stopwatch.Stop();
-                result = getTestResult(stopwatch, testCases);
+                result = getTestResult(studentStopwatch, testCases);
             
                 stopwatch2.Start();
-                var enrollStopwatch = await _enrollmentService.TestEnrollmentUpdate(enrollmentDataNom, universities, lecturers, courses, updatedStudents, testCases);
+                var enrollStopwatch = await _enrollmentService.TestEnrollmentUpdate(enrollmentDataNom, universities, lecturers, courses, oldStudentDatas, testCases);
                 result2 = getTestResult(enrollStopwatch, testCases);
                 stopwatch2.Stop();
                 //milis
+                
+            
                 total.MiliSeconds = result.MiliSeconds +result2.MiliSeconds;
                 if (total.MiliSeconds > 1000)
                 {
@@ -144,7 +146,7 @@
                 double miliseconds = totalMilis * 1.0;
                 total.AverageTime = miliseconds / total.DataProcessed;
                 testResult = await _performanceTestUpdateService.SavePerformanceTestData(total);
-            //}
+           // }
 
             return Ok(testResult);
         }

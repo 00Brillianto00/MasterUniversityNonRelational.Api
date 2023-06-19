@@ -42,7 +42,7 @@ namespace MasterUniversityNonRelational.Api.Models
         [BsonElement("studentPostalCode")]
         public int StudentPostalCode { get; set; }
 
-        [BsonElement("isDeleted ")]
+        [BsonElement("isDeleted")]
         public bool IsDeleted { get; set; }
     }
 }
