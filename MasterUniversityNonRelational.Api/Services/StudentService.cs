@@ -6,6 +6,7 @@ using MongoDB.Driver;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
+using System.Numerics;
 
 namespace MasterUniversityNonRelational.Api.Services
 {
@@ -211,11 +212,18 @@ namespace MasterUniversityNonRelational.Api.Services
             try
             {
                 studentData = await _student.Find(student => true && student.IsDeleted.Equals(false)).SortBy(student => student.StudentNumber).Limit(testCase).ToListAsync();
+                if (studentData.Count() != testCase)
+                {
+                    //string errMsg = "Not Enough Datas in Database, Please Repopulate Datas.";
+                    throw new Exception("Not Enough Datas in Database, Please Repopulate Datas.");
+                }
+
             }
             catch (Exception ex)
             {
-                throw new Exception("Error When Retrieving Data");
+                throw new Exception(ex.Message.ToString());
             }
+
             return studentData;
         }
 

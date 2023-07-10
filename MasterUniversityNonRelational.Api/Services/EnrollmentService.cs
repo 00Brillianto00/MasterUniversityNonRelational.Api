@@ -125,7 +125,7 @@ namespace MasterUniversityNonRelational.Api.Services
             }
         }
 
-        public async Task<List<Enrollment>> TestEnrollmentInsert(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses,int studentNom)
+        public async Task<Stopwatch> TestEnrollmentInsert(int testCases, List<UniversityData> universities, List<Lecturer> lecturers, List<Courses> courses,int studentNom)
         {
             List<Enrollment> totalEnrollments = new List<Enrollment>();
             //List<Student> studentDatas = new List<Student>();
@@ -137,6 +137,7 @@ namespace MasterUniversityNonRelational.Api.Services
             string country = "Indonesia";
             string province = "DKI Jakarta";
             string city = "Jakarta Barat";
+            Stopwatch stopwatch= new Stopwatch();
             try
             {
                 for (int x = 0; x < studentNom; x++)
@@ -197,14 +198,17 @@ namespace MasterUniversityNonRelational.Api.Services
                             enrollmentHeader.enrollmentDetail.Add(enrollmentDetail);
                         }
                         //await _enrollment.InsertOneAsync(enrollmentHeader);
+                        
                         enrollments.Add(enrollmentHeader);
                         totalEnrollments.Add(enrollmentHeader);
                         //totalEnrollments.Add(enrollmentHeader);
                     }
+                    stopwatch.Start();
                     await _students.InsertManyAsync(studentDatas);
                     await _enrollment.InsertManyAsync(enrollments);
+                    stopwatch.Stop();
                 }
-                return totalEnrollments;
+                return stopwatch;
             }
             catch (Exception ex)
             {

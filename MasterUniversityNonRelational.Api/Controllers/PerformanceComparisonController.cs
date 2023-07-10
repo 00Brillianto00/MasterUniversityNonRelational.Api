@@ -62,14 +62,14 @@
             List<UniversityData> universities = getUniv.ToList();
             //for (int x=0; x<10; x++)
             //{
-                Stopwatch stopwatch = new Stopwatch();
+                //Stopwatch stopwatch = new Stopwatch();
                 TestResultData result = new TestResultData();
-                stopwatch.Start();
+                //stopwatch.Start();
                 //var students = await _studentService.TestStudentInsert(studentDataNom, universities);
-                var enrollments = await _enrollmentService.TestEnrollmentInsert(enrollmentDataNom, universities, lecturers, courses, studentDataNom); 
-                stopwatch.Stop();
+                var enrollmentStopwatch = await _enrollmentService.TestEnrollmentInsert(enrollmentDataNom, universities, lecturers, courses, studentDataNom); 
+                //stopwatch.Stop();
 
-                result = getTestResult(stopwatch, testCases);
+                result = getTestResult(enrollmentStopwatch, testCases);
             
                 testResult = await _performanceTestInsertService.SavePerformanceTestData(result);
                //await TestDelete(testCases);
@@ -89,15 +89,15 @@
             List<Lecturer> lecturers = getLecturers.ToList();
             var getUniv = await _universityService.GetAllAsync();
             List<UniversityData> universities = getUniv.ToList();
-            List<Student> oldStudentDatas = await _studentService.TestStudentGet(studentDataNom);
-
-            if (oldStudentDatas.Count() != studentDataNom)
+            List<Student> oldStudentDatas = new List<Student>();
+            try
             {
-                throw new Exception("Not Enough Datas in Database, Please Repopulate Database by Inserting Datas");
+                oldStudentDatas = await _studentService.TestStudentGet(studentDataNom);
 
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message.ToString());
             }
-            //for (int x = 0; x < 10; x++)
-           // {
 
                 TestResultData result = new TestResultData();
                 TestResultData result2 = new TestResultData();
@@ -146,7 +146,6 @@
                 double miliseconds = totalMilis * 1.0;
                 total.AverageTime = miliseconds / total.DataProcessed;
                 testResult = await _performanceTestUpdateService.SavePerformanceTestData(total);
-           // }
 
             return Ok(testResult);
         }
@@ -161,13 +160,18 @@
             //{
                 TestResultData result = new TestResultData();
                 Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
+                try
+                {
+                    stopwatch.Start();
+                    var students = await _studentService.TestStudentGet(studentDataNom);
+                    var enrollments = await _enrollmentService.TestEnrollmentGet(enrollmentDataNom,students);
+                    stopwatch.Stop();
 
-                var students = await _studentService.TestStudentGet(studentDataNom);
-
-                var enrollments = await _enrollmentService.TestEnrollmentGet(enrollmentDataNom,students);
-
-                stopwatch.Stop();
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message.ToString());
+                }
 
                 result = getTestResult(stopwatch, testCases);
                 testResult = await _performanceTestGetService.SavePerformanceTestData(result);
@@ -198,11 +202,17 @@
             int studentDataNom = testCases / 100;
             int enrollmentDataNom = 10;;
 
-            var students = await _studentService.TestStudentGet(studentDataNom);
-            if(students.Count < studentDataNom )
+            List<Student> students = new List<Student>();
+            try
             {
-                throw new Exception("Not Enough Datas in Database, Please Repopulate Datas.");
+                students = await _studentService.TestStudentGet(studentDataNom);
             }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message.ToString());
+            }
+
+
             stopwatch.Start();
             var tes = await _studentService.TestStudentDelete(studentDataNom, students);
             var tes2 = await _enrollmentService.TestEnrollmentDelete(students);
