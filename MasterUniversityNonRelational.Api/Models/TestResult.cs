@@ -68,4 +68,10 @@ namespace MasterUniversityNonRelational.Api.Models
         [BsonElement("isDeleted ")]
         public bool IsDeleted {get; set;}
     }
+
+    public class GraphData
+    {
+        public int DataAmount { get; set; }
+        public double AveragePerformanceSpeed { get; set; }
+    }
 }

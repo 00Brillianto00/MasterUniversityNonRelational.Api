@@ -9,5 +9,6 @@ namespace MasterUniversityNonRelational.Api.Interfaces
         Task<TestResultData> GetLatestPerformanceTestData();
         Task<List<TestResultData>> GetTopPerformanceTestData(int topData);
         Task<TestResultData> SavePerformanceTestData(TestResultData testData);
+        Task<List<GraphData>> GetTopPerformanceGraphData();
     }
 }
