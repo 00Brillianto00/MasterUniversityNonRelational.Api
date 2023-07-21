@@ -259,6 +259,42 @@
 
         }
 
+        [HttpGet("GetTopInsertDataGraph/")]
+
+        public async Task<ActionResult<IEnumerable<GraphData>>> GetTopInsertDataGraph()
+        {
+            var result = await _performanceTestDeleteService.GetTopPerformanceGraphData();
+            return Ok(result);
+
+        }
+
+        [HttpGet("GetTopUpdateDataGraph/")]
+
+        public async Task<ActionResult<IEnumerable<GraphData>>> GetTopUpdateDataGraph()
+        {
+            var result = await _performanceTestDeleteService.GetTopPerformanceGraphData();
+            return Ok(result);
+
+        }
+
+        [HttpGet("GetTopGetDataGraph/")]
+
+        public async Task<ActionResult<IEnumerable<GraphData>>> GetTopGetDataGraph()
+        {
+            var result = await _performanceTestDeleteService.GetTopPerformanceGraphData();
+            return Ok(result);
+
+        }
+
+        [HttpGet("GetTopDeleteDataGraph/")]
+
+        public async Task<ActionResult<IEnumerable<GraphData>>> GetTopDeleteDataGraph()
+        {
+            var result = await _performanceTestDeleteService.GetTopPerformanceGraphData();
+            return Ok(result);
+
+        }
+
         private TestResultData getTestResult(Stopwatch stopWatch, int testCases)
         {
             TestResultData result = new TestResultData();
