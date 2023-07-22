@@ -263,7 +263,7 @@
 
         public async Task<ActionResult<IEnumerable<GraphData>>> GetTopInsertDataGraph()
         {
-            var result = await _performanceTestDeleteService.GetTopPerformanceGraphData();
+            var result = await _performanceTestInsertService.GetTopPerformanceGraphData();
             return Ok(result);
 
         }
@@ -272,7 +272,7 @@
 
         public async Task<ActionResult<IEnumerable<GraphData>>> GetTopUpdateDataGraph()
         {
-            var result = await _performanceTestDeleteService.GetTopPerformanceGraphData();
+            var result = await _performanceTestUpdateService.GetTopPerformanceGraphData();
             return Ok(result);
 
         }
@@ -281,7 +281,7 @@
 
         public async Task<ActionResult<IEnumerable<GraphData>>> GetTopGetDataGraph()
         {
-            var result = await _performanceTestDeleteService.GetTopPerformanceGraphData();
+            var result = await _performanceTestGetService.GetTopPerformanceGraphData();
             return Ok(result);
 
         }
